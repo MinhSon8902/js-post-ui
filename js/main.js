@@ -9,8 +9,13 @@ async function main() {
     }
     const data = await postApi.getAll(queryParams)
     console.log(data)
-  } catch (error) {}
-  // const response = await axiosClient.get('/posts')
+  } catch (error) {
+    console.log('get all failed: ', error)
+  }
+  await postApi.updateFormData({
+    id: 'sktwi1cgkkuif36dj',
+    title: 'Dicta molestiae aut 222',
+  })
 }
 
 main()
