@@ -124,17 +124,6 @@ function initPagination() {
   console.log({ preLink, nextLink })
 }
 
-function initURL() {
-  const url = new URL(window.location)
-  if (!url.searchParams.get('_limit')) {
-    url.searchParams.set('_limit', 6)
-  }
-  if (!url.searchParams.get('_page')) {
-    url.searchParams.set('_page', 1)
-  }
-  history.pushState({}, '', url)
-}
-
 function initSearch() {
   const searchInput = document.getElementById('searchInput')
   if (!searchInput) return
@@ -153,11 +142,19 @@ function initSearch() {
 
 ;(async () => {
   try {
-    initPagination()
-    initSearch()
-    initURL()
+    const url = new URL(window.location)
 
-    const queryParams = new URLSearchParams(window.location.search)
+    if (!url.searchParams.get('_limit')) {
+      url.searchParams.set('_limit', 6)
+    }
+    if (!url.searchParams.get('_page')) {
+      url.searchParams.set('_page', 1)
+    }
+    history.pushState({}, '', url)
+    const queryParams = url.searchParams
+
+    initPagination(queryParams)
+    initSearch(queryParams)
 
     const { data, pagination } = await postApi.getAll(queryParams)
 
