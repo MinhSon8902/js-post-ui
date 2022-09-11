@@ -72,6 +72,8 @@ async function handleFilterChange(filterName, filterValue) {
   try {
     const url = new URL(window.location)
     url.searchParams.set(filterName, filterValue)
+    if (filterName === 'title_like') url.searchParams.set('_page', 1)
+
     history.pushState({}, '', url)
 
     const { data, pagination } = await postApi.getAll(url.searchParams)
@@ -136,6 +138,10 @@ function initURL() {
 function initSearch() {
   const searchInput = document.getElementById('searchInput')
   if (!searchInput) return
+  const queryParams = new URLSearchParams(window.location.search)
+  if (queryParams.get('title_like')) {
+    searchInput.value = queryParams.get('title_like')
+  }
   const debounceSearch = debounce(
     (event) => handleFilterChange('title_like', event.target.value),
     500
