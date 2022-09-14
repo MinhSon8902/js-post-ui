@@ -1,10 +1,36 @@
-export function registerLightbox() {
+function showModal(modalElement) {
+  if (!window.bootstrap) return
+  const modal = new window.bootstrap.Modal(modalElement)
+  if (modal) modal.show()
+}
+
+export function registerLightbox({ modalId, imgSelector, prevSelector, nextSelector }) {
+  const modalElement = document.getElementById(modalId)
+  if (!modalElement) return
+
+  const imageElement = modalElement.querySelector(imgSelector)
+  const preButton = modalElement.querySelector(prevSelector)
+  const nextButton = modalElement.querySelector(nextSelector)
+  if (!imageElement || !preButton || !nextButton) return
+
+  let imgList = []
+  let currentIndex = 0
+
+  function showImageAtIndex(index) {
+    imageElement.src = imgList[index].src
+  }
+
   document.addEventListener('click', (event) => {
     const { target } = event
     if (target.tagName !== 'IMG' || !target.dataset.album) return
 
-    let imgList = document.querySelectorAll(`img[data-album="${target.dataset.album}"]`)
-    const index = [...imgList].findIndex((x) => x === target)
-    console.log('album image click', { target, index, imgList })
+    imgList = document.querySelectorAll(`img[data-album="${target.dataset.album}"]`)
+    currentIndex = [...imgList].findIndex((x) => x === target)
+    console.log('album image click', { target, currentIndex, imgList })
+    showImageAtIndex(currentIndex)
+    showModal(modalElement)
   })
+
+  preButton.addEventListener('click', () => {})
+  nextButton.addEventListener('click', () => {})
 }

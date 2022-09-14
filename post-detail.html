@@ -133,7 +133,36 @@
       <small>Created by Po with <i class="fas fa-heart"></i></small>
     </footer>
 
+    <div id="lightbox" class="modal fade" tabindex="-1">
+      <div class="modal-dialog modal-dialog-centered modal-xl">
+        <div class="modal-content">
+          <div class="modal-body">
+            <img data-id="lightboxImg" src="" alt="lightbox" width="100%" />
+            <div class="text-center mt-3">
+              <button
+                data-id="lightboxPrev"
+                type="button"
+                class="btn btn-secondary btn-sm"
+                data-bs-dismiss="modal"
+              >
+                Prev
+              </button>
+              <button data-id="lightboxNext" type="button" class="btn btn-secondary btn-sm">
+                Next
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script
+      src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/js/bootstrap.bundle.min.js"
+      integrity="sha384-A3rJD856KowSb7dwlZdYEkO39Gagi7vIsF0jrRAoQmDKKtQBHUuLZ9AsSv4jD4Xa"
+      crossorigin="anonymous"
+    ></script>
     <!-- Scripts should be placed here to prevent blocking render UI -->
+
     <script type="module" src="./js/post-detail.js"></script>
   </body>
 </html>
