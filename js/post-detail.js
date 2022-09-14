@@ -1,12 +1,6 @@
-import dayjs, { Dayjs } from 'dayjs'
+import dayjs from 'dayjs'
 import postApi from './api/postApi'
-import { setTextContent } from './utils'
-
-// id="goToEditPageLink"
-// id="postHeroImage"
-// id="postDetailTitle"
-// id="postDetailAuthor"
-// id="postDetailDescription"
+import { registerLightbox, setTextContent } from './utils'
 
 function renderPostDetail(post) {
   if (!post) return
@@ -36,6 +30,7 @@ function renderPostDetail(post) {
 }
 
 ;(async () => {
+  registerLightbox()
   try {
     const searchParams = new URLSearchParams(window.location.search)
     const postId = searchParams.get('id')
