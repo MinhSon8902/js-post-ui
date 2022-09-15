@@ -35,6 +35,4 @@ export function initPagination({ elementId, defaultParams, onChange }) {
       if (page < totalPages) onChange?.(page + 1)
     })
   }
-
-  console.log({ preLink, nextLink })
 }
