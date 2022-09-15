@@ -8,6 +8,8 @@ export function registerLightbox({ modalId, imgSelector, prevSelector, nextSelec
   const modalElement = document.getElementById(modalId)
   if (!modalElement) return
 
+  if (Boolean(modalElement.dataset.registered)) return
+
   const imageElement = modalElement.querySelector(imgSelector)
   const preButton = modalElement.querySelector(prevSelector)
   const nextButton = modalElement.querySelector(nextSelector)
@@ -31,6 +33,14 @@ export function registerLightbox({ modalId, imgSelector, prevSelector, nextSelec
     showModal(modalElement)
   })
 
-  preButton.addEventListener('click', () => {})
-  nextButton.addEventListener('click', () => {})
+  preButton.addEventListener('click', () => {
+    currentIndex = (currentIndex - 1 + imgList.length) % imgList.length
+    showImageAtIndex(currentIndex)
+  })
+  nextButton.addEventListener('click', () => {
+    currentIndex = (currentIndex + 1) % imgList.length
+    showImageAtIndex(currentIndex)
+  })
+
+  modalElement.dataset.registered = 'true'
 }
