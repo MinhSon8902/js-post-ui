@@ -1,4 +1,5 @@
 import { setBackgroundImage, setFieldValue, setTextContent } from './common'
+import * as yup from 'yup'
 
 function setFormValues(form, formValue) {
   setFieldValue(form, '[name="title"]', formValue?.title)
@@ -24,44 +25,60 @@ function getFormValue(form) {
   return formValues
 }
 
-function getTitleError(form) {
-  const titleElement = form.querySelector('[name="title"]')
-  if (!titleElement) return
-
-  if (titleElement.validity.valueMissing) return 'please enter title'
-
-  return ''
+function getPostSchema() {
+  return yup.object().shape({
+    title: yup.string().required('Please enter title'),
+    author: yup
+      .string()
+      .required('Please enter author')
+      .test('at-least-two-words', 'Please enter at least two words', (value) => {
+        value.split(
+          ' '.filter((x) => {
+            !!x && x.length >= 3
+          }).length >= 2
+        )
+      }),
+    description: yup.string(),
+  })
 }
 
-function validatePostForm(form, formValues) {
-  const errors = {
-    title: getTitleError(form),
-    // author: getAuthorError(form),
-  }
+function setFieldError(form, name, error) {
+  const element = form.querySelector(`[name="${name}"]`)
+  if (element) element.setCustomValidity(error)
+  setTextContent(form.parentElement, '.invalid-feedback', error)
+}
 
-  for (const key in errors) {
-    const element = form.querySelector(`[name="${key}"]`)
-    if (element) element.setCustomValidity(errors[key])
-    setTextContent(form.parentElement, '.invalid-feedback', errors[key])
+async function validatePostForm(form, formValues) {
+  try {
+    ;['title', 'author'].forEach((name) => setFieldError(form, name, ''))
+
+    const schema = getPostSchema()
+    await schema.validate(formValues, { abortEarly: false })
+  } catch (error) {
+    console.log(error.name)
+    console.log(error.inner)
+
+    for (const validationError of error.inner) {
+      const name = validationError.path
+      setFieldError(form, name, validationError.message)
+    }
   }
 
   const isValid = form.checkValidity()
   if (!isValid) form.classList.add('was-validated')
   return isValid
-
-  return false
 }
 
 export function initPostForm({ formId, defaultValues, onSubmit }) {
   const form = document.getElementById(formId)
   if (!form) return
 
-  console.log('form', form)
-
   setFormValues(form, defaultValues)
 
   form.addEventListener('submit', (event) => {
     event.preventDefault()
+
+    console.log('submit form')
 
     const formValues = getFormValue(form)
     console.log(formValues)
