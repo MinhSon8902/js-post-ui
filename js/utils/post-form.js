@@ -31,13 +31,11 @@ function getPostSchema() {
     author: yup
       .string()
       .required('Please enter author')
-      .test('at-least-two-words', 'Please enter at least two words', (value) => {
-        value.split(
-          ' '.filter((x) => {
-            !!x && x.length >= 3
-          }).length >= 2
-        )
-      }),
+      .test(
+        'at-least-two-words',
+        'Please enter at least two words',
+        (value) => value.split(' ').filter((x) => !!x && x.length >= 3).length >= 2
+      ),
     description: yup.string(),
   })
 }
@@ -55,12 +53,16 @@ async function validatePostForm(form, formValues) {
     const schema = getPostSchema()
     await schema.validate(formValues, { abortEarly: false })
   } catch (error) {
-    console.log(error.name)
-    console.log(error.inner)
+    const errorLog = {}
+    if (error.name === 'ValidationError' && Array.isArray(error.inner)) {
+      for (const validationError of error.inner) {
+        const name = validationError.path
 
-    for (const validationError of error.inner) {
-      const name = validationError.path
-      setFieldError(form, name, validationError.message)
+        if (errorLog[name]) continue
+
+        setFieldError(form, name, validationError.message)
+        errorLog[name] = true
+      }
     }
   }
 
