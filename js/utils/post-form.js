@@ -1,23 +1,16 @@
-import { setBackgroundImage, setFieldValue, setTextContent } from './common'
+import { randomNumber, setBackgroundImage, setFieldValue, setTextContent } from './common'
 import * as yup from 'yup'
 
 function setFormValues(form, formValue) {
   setFieldValue(form, '[name="title"]', formValue?.title)
   setFieldValue(form, '[name="author"]', formValue?.author)
   setFieldValue(form, '[name="description"]', formValue?.description)
-
   setFieldValue(form, '[name="imageUrl"]', formValue?.imageUrl)
-
   setBackgroundImage(document, '#postHeroImage', formValue?.imageUrl)
 }
 
 function getFormValue(form) {
   const formValues = {}
-  // ;['title', 'author', 'description', 'imageUrl'].forEach((name) => {
-  //   const field = form.querySelector(`[name="${name}"]`)
-  //   if (field) formValues[name] = field.value
-  // })
-
   const data = new FormData(form)
   for (const [key, value] of data) {
     formValues[key] = value
@@ -37,6 +30,10 @@ function getPostSchema() {
         (value) => value.split(' ').filter((x) => !!x && x.length >= 3).length >= 2
       ),
     description: yup.string(),
+    imageUrl: yup
+      .string()
+      .required('Please random background image')
+      .url('Please enter a valid URL'),
   })
 }
 
@@ -48,7 +45,7 @@ function setFieldError(form, name, error) {
 
 async function validatePostForm(form, formValues) {
   try {
-    ;['title', 'author'].forEach((name) => setFieldError(form, name, ''))
+    ;['title', 'author', 'imageUrl'].forEach((name) => setFieldError(form, name, ''))
 
     const schema = getPostSchema()
     await schema.validate(formValues, { abortEarly: false })
@@ -71,21 +68,58 @@ async function validatePostForm(form, formValues) {
   return isValid
 }
 
+function showLoading(form) {
+  const button = form.querySelector('[name="submit"]')
+  if (button) {
+    button.disabled = true
+    button.textContent = 'Saving...'
+  }
+}
+
+function hideLoading(form) {
+  const button = form.querySelector('[name="submit"]')
+  if (button) {
+    button.disabled = false
+    button.textContent = 'Save'
+  }
+}
+
+function initRandomImage(form) {
+  const randomButton = document.getElementById('postChangeImage')
+  if (!randomButton) return
+
+  randomButton.addEventListener('click', () => {
+    const imageUrl = `https://picsum.photos/id/${randomNumber(1000)}/1368/400`
+
+    setFieldValue(form, '[name="imageUrl"]', imageUrl)
+    setBackgroundImage(document, '#postHeroImage', imageUrl)
+  })
+}
+
 export function initPostForm({ formId, defaultValues, onSubmit }) {
   const form = document.getElementById(formId)
   if (!form) return
 
+  let submitting = false
   setFormValues(form, defaultValues)
+
+  initRandomImage(form)
 
   form.addEventListener('submit', async (event) => {
     event.preventDefault()
 
+    if (submitting) return
+
+    showLoading(form)
+    submitting = true
+
     const formValues = getFormValue(form)
-
     formValues.id = defaultValues.id
-    const isValid = await validatePostForm(form, formValues)
 
-    if (!isValid) return
-    onSubmit?.(formValues)
+    const isValid = await validatePostForm(form, formValues)
+    if (isValid) await onSubmit?.(formValues)
+
+    hideLoading(form)
+    submitting = false
   })
 }
