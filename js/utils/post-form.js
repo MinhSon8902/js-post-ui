@@ -40,7 +40,7 @@ function getPostSchema() {
 function setFieldError(form, name, error) {
   const element = form.querySelector(`[name="${name}"]`)
   if (element) element.setCustomValidity(error)
-  setTextContent(form.parentElement, '.invalid-feedback', error)
+  setTextContent(element.parentElement, '.invalid-feedback', error)
 }
 
 async function validatePostForm(form, formValues) {
@@ -50,6 +50,8 @@ async function validatePostForm(form, formValues) {
     const schema = getPostSchema()
     await schema.validate(formValues, { abortEarly: false })
   } catch (error) {
+    console.log(error.name)
+    console.log(error.inner)
     const errorLog = {}
     if (error.name === 'ValidationError' && Array.isArray(error.inner)) {
       for (const validationError of error.inner) {
