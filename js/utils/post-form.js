@@ -98,6 +98,20 @@ function initRandomImage(form) {
   })
 }
 
+function imageSourceControl(form, selectedValue) {
+  const controlList = form.querySelectorAll('[data-id="imageSource"]')
+  controlList.forEach((control) => {
+    control.hidden = control.dataset.imageSource !== selectedValue
+  })
+}
+
+function initRadioImageSource(form) {
+  const radioList = form.querySelectorAll('[name="imageSource"]')
+  radioList.forEach((radio) => {
+    radio.addEventListener('change', (event) => imageSourceControl(form, event.target.value))
+  })
+}
+
 export function initPostForm({ formId, defaultValues, onSubmit }) {
   const form = document.getElementById(formId)
   if (!form) return
@@ -106,6 +120,7 @@ export function initPostForm({ formId, defaultValues, onSubmit }) {
   setFormValues(form, defaultValues)
 
   initRandomImage(form)
+  initRadioImageSource(form, defaultValues)
 
   form.addEventListener('submit', async (event) => {
     event.preventDefault()
