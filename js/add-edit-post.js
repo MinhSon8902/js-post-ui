@@ -2,6 +2,8 @@ import postApi from './api/postApi'
 import { initPostForm, toast } from './utils'
 
 async function handlePostFormSubmit(formValues) {
+  console.log('submit from parent: ', formValues)
+  return
   try {
     const savedPost = formValues.id
       ? await postApi.update(formValues)

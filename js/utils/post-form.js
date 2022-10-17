@@ -1,6 +1,11 @@
 import { randomNumber, setBackgroundImage, setFieldValue, setTextContent } from './common'
 import * as yup from 'yup'
 
+const ImageSource = {
+  PICSUM: 'picsum',
+  UPLOAD: 'upload',
+}
+
 function setFormValues(form, formValue) {
   setFieldValue(form, '[name="title"]', formValue?.title)
   setFieldValue(form, '[name="author"]', formValue?.author)
@@ -30,10 +35,26 @@ function getPostSchema() {
         (value) => value.split(' ').filter((x) => !!x && x.length >= 3).length >= 2
       ),
     description: yup.string(),
-    imageUrl: yup
+
+    imageSource: yup
       .string()
-      .required('Please random background image')
-      .url('Please enter a valid URL'),
+      .required('Please select an image source')
+      .oneOf([ImageSource.PICSUM, ImageSource.UPLOAD], 'Invalid image source'),
+
+    imageUrl: yup.string().when('imageSource', {
+      is: ImageSource.PICSUM,
+      then: yup
+        .string()
+        .required('Please random a background image')
+        .url('Please enter a valid URL'),
+    }),
+
+    image: yup.mixed().when('imageSource', {
+      is: ImageSource.UPLOAD,
+      then: yup
+        .mixed()
+        .test('required', 'Please select an image to upload', (value) => Boolean(value?.name)),
+    }),
   })
 }
 
@@ -45,7 +66,7 @@ function setFieldError(form, name, error) {
 
 async function validatePostForm(form, formValues) {
   try {
-    ;['title', 'author', 'imageUrl'].forEach((name) => setFieldError(form, name, ''))
+    ;['title', 'author', 'imageUrl', 'image'].forEach((name) => setFieldError(form, name, ''))
 
     const schema = getPostSchema()
     await schema.validate(formValues, { abortEarly: false })
