@@ -34,7 +34,7 @@ function registerPostDeleteEvent() {
       console.log('failed to remove post', error)
       toast.error(error.messenger)
     }
-    console.log('remove post click', event.detail)
+    // console.log('remove post click', event.detail)
   })
 }
 
