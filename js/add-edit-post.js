@@ -55,6 +55,7 @@ async function handlePostFormSubmit(formValues) {
           description: '',
           author: '',
           image: '',
+          imageUrl: '',
         }
 
     initPostForm({
