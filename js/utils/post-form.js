@@ -74,7 +74,6 @@ async function validatePostForm(form, formValues) {
     ;['title', 'author', 'imageUrl', 'image'].forEach((name) => setFieldError(form, name, ''))
 
     const schema = getPostSchema()
-    console.log('form submit: ', formValues)
     await schema.validate(formValues, { abortEarly: false })
   } catch (error) {
     const errorLog = {}
